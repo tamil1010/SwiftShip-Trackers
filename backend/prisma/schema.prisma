@@ -1,0 +1,151 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  phone        String?
+  role         String   @default("CUSTOMER") // CUSTOMER, DELIVERY_AGENT, SUPPORT, ADMIN
+  address      String?
+  city         String?
+  state        String?
+  pincode      String?
+  profileImage String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  createdParcels  Parcel[]        @relation("CreatedParcels")
+  assignedParcels Parcel[]        @relation("AssignedParcels")
+  notifications   Notification[]
+  supportTickets  SupportTicket[] @relation("UserTickets")
+  assignedTickets SupportTicket[] @relation("AssignedTickets")
+
+  @@index([email])
+  @@index([role])
+}
+
+model Sender {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  email     String?
+  address   String
+  city      String
+  state     String
+  pincode   String
+  country   String   @default("India")
+  parcel    Parcel?
+}
+
+model Receiver {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  email     String?
+  address   String
+  city      String
+  state     String
+  pincode   String
+  country   String   @default("India")
+  parcel    Parcel?
+}
+
+model Parcel {
+  id                    String    @id @default(uuid())
+  trackingNumber        String    @unique
+  senderId              String    @unique
+  sender                Sender    @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId            String    @unique
+  receiver              Receiver  @relation(fields: [receiverId], references: [id], onDelete: Cascade)
+  createdById           String?
+  createdBy             User?     @relation("CreatedParcels", fields: [createdById], references: [id])
+  assignedAgentId       String?
+  assignedAgent         User?     @relation("AssignedParcels", fields: [assignedAgentId], references: [id])
+  packageDescription    String
+  weight                Float
+  length                Float?
+  width                 Float?
+  height                Float?
+  status                String    @default("BOOKED") // BOOKED, PICKED_UP, IN_TRANSIT, OUT_FOR_DELIVERY, DELIVERED, CANCELLED, DELIVERY_FAILED, RETURNED
+  priority              String    @default("STANDARD") // STANDARD, EXPRESS, PRIORITY
+  currentLocation       String
+  estimatedDeliveryDate DateTime?
+  shippingCost          Float
+  paymentStatus         String    @default("PAID") // PAID, PENDING
+  bookingDate           DateTime  @default(now())
+  pickedUpAt            DateTime?
+  deliveredAt           DateTime?
+  notes                 String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  trackingEvents TrackingEvent[]
+  notifications  Notification[]
+  supportTickets SupportTicket[]
+
+  @@index([trackingNumber])
+  @@index([status])
+  @@index([assignedAgentId])
+  @@index([createdById])
+  @@index([createdAt])
+}
+
+model TrackingEvent {
+  id          String   @id @default(uuid())
+  parcelId    String
+  parcel      Parcel   @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  status      String
+  location    String
+  message     String
+  updatedById String?
+  timestamp   DateTime @default(now())
+  metadata    String?
+
+  @@index([parcelId])
+  @@index([timestamp])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parcelId  String?
+  parcel    Parcel?  @relation(fields: [parcelId], references: [id], onDelete: SetNull)
+  title     String
+  message   String
+  type      String   @default("STATUS_UPDATE")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model SupportTicket {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation("UserTickets", fields: [userId], references: [id], onDelete: Cascade)
+  parcelId     String?
+  parcel       Parcel?  @relation(fields: [parcelId], references: [id], onDelete: SetNull)
+  subject      String
+  description  String
+  status       String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+  priority     String   @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  assignedToId String?
+  assignedTo   User?    @relation("AssignedTickets", fields: [assignedToId], references: [id])
+  resolution   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
