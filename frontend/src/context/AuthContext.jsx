@@ -17,11 +17,27 @@ export const AuthProvider = ({ children }) => {
   const { addToast } = useToast();
 
   useEffect(() => {
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+    const isLocalhost = typeof window !== 'undefined' && (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+    );
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || (isLocalhost ? 'http://localhost:5000' : null);
+
+    if (!socketUrl) {
+      console.log('[Socket.IO] No remote WebSocket URL configured for production (VITE_SOCKET_URL). Live push notifications fallback active.');
+      setSocket({
+        on: () => {},
+        off: () => {},
+        emit: () => {},
+        disconnect: () => {},
+      });
+      return;
+    }
+
     const initSocket = io(socketUrl, {
       autoConnect: true,
       transports: ['websocket', 'polling'],
-      reconnectionAttempts: 10,
+      reconnectionAttempts: 5,
       reconnectionDelay: 3000,
       timeout: 5000,
     });
@@ -32,8 +48,7 @@ export const AuthProvider = ({ children }) => {
       console.log('[Socket.IO Client] Connected to server.');
     });
 
-    initSocket.on('connect_error', (err) => {
-      // Graceful socket error handling when backend is starting or offline
+    initSocket.on('connect_error', () => {
       console.warn('[Socket.IO] Connecting to server at ' + socketUrl + '...');
     });
 
