@@ -17,15 +17,24 @@ export const AuthProvider = ({ children }) => {
   const { addToast } = useToast();
 
   useEffect(() => {
-    const initSocket = io('http://localhost:5000', {
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+    const initSocket = io(socketUrl, {
       autoConnect: true,
       transports: ['websocket', 'polling'],
+      reconnectionAttempts: 10,
+      reconnectionDelay: 3000,
+      timeout: 5000,
     });
 
     setSocket(initSocket);
 
     initSocket.on('connect', () => {
       console.log('[Socket.IO Client] Connected to server.');
+    });
+
+    initSocket.on('connect_error', (err) => {
+      // Graceful socket error handling when backend is starting or offline
+      console.warn('[Socket.IO] Connecting to server at ' + socketUrl + '...');
     });
 
     initSocket.on('parcel_status_change', (data) => {
