@@ -116,9 +116,9 @@ const CustomerDashboard = () => {
                       {parcels.slice(0, 5).map((p) => (
                         <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
                           <td className="py-3 px-2 font-mono font-bold text-slate-900">{p.trackingNumber}</td>
-                          <td className="py-3 px-2 text-slate-700 font-medium">{p.receiver.city}</td>
+                          <td className="py-3 px-2 text-slate-700 font-medium">{p.receiver?.city || 'Destination'}</td>
                           <td className="py-3 px-2"><StatusBadge status={p.status} size="sm" /></td>
-                          <td className="py-3 px-2 text-slate-500">{new Date(p.bookingDate).toLocaleDateString()}</td>
+                          <td className="py-3 px-2 text-slate-500">{new Date(p.bookingDate || p.createdAt || Date.now()).toLocaleDateString()}</td>
                           <td className="py-3 px-2 text-right">
                             <Link
                               to={`/track/${p.trackingNumber}`}

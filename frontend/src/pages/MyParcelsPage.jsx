@@ -114,10 +114,10 @@ const MyParcelsPage = () => {
                         <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{p.trackingNumber}</td>
                         <td className="py-3.5 px-4 text-slate-700 font-medium">{p.packageDescription} ({p.weight} kg)</td>
                         <td className="py-3.5 px-4 text-slate-600">
-                          {p.sender.city} → <strong>{p.receiver.city}</strong>
+                          {p.sender?.city || 'Origin'} → <strong>{p.receiver?.city || 'Destination'}</strong>
                         </td>
                         <td className="py-3.5 px-4"><StatusBadge status={p.status} size="sm" /></td>
-                        <td className="py-3.5 px-4 text-slate-500">{new Date(p.bookingDate).toLocaleDateString()}</td>
+                        <td className="py-3.5 px-4 text-slate-500">{new Date(p.bookingDate || p.createdAt || Date.now()).toLocaleDateString()}</td>
                         <td className="py-3.5 px-4 text-right">
                           <Link
                             to={`/track/${p.trackingNumber}`}

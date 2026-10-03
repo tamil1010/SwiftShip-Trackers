@@ -81,8 +81,8 @@ const AssignedParcelsPage = () => {
                     {parcels.map((p) => (
                       <tr key={p.id} className="hover:bg-slate-50/80">
                         <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{p.trackingNumber}</td>
-                        <td className="py-3.5 px-4 font-bold text-slate-800">{p.receiver.name} ({p.receiver.phone})</td>
-                        <td className="py-3.5 px-4 text-slate-600">{p.receiver.address}, {p.receiver.city}</td>
+                        <td className="py-3.5 px-4 font-bold text-slate-800">{p.receiver?.name || 'Recipient'} ({p.receiver?.phone || 'N/A'})</td>
+                        <td className="py-3.5 px-4 text-slate-600">{p.receiver?.address || ''}, {p.receiver?.city || ''}</td>
                         <td className="py-3.5 px-4"><StatusBadge status={p.status} size="sm" /></td>
                         <td className="py-3.5 px-4 text-right">
                           <Link

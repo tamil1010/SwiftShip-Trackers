@@ -332,6 +332,18 @@ const initialTickets = [
     customerId: 'user-cust-1',
     createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
     resolutionNotes: 'Notified delivery agent Karthik Raja.',
+    user: {
+      id: 'user-cust-1',
+      name: 'Arun Kumar',
+      email: 'customer1@swiftship.demo',
+      phone: '+91 94433 10001',
+    },
+    parcel: {
+      id: 'parcel-10001',
+      trackingNumber: 'SST-20261002-10001',
+      status: 'OUT_FOR_DELIVERY',
+      currentLocation: 'Chennai Central Hub',
+    },
   },
 ];
 
@@ -701,18 +713,33 @@ export function handleMockRequest(config) {
   // 16. SUPPORT: GET /support
   if (path === '/support' && method === 'get') {
     const tickets = getStore('tickets', initialTickets);
-    return Promise.resolve({ status: 200, data: { success: true, tickets } });
+    const users = getStore('users', initialUsers);
+    const parcels = getStore('parcels', initialParcels);
+
+    const enriched = tickets.map((t) => {
+      const u = t.user || users.find((usr) => usr.id === t.customerId) || {
+        name: 'Arun Kumar',
+        email: 'customer1@swiftship.demo',
+        phone: '+91 94433 10001',
+      };
+      const p = t.parcel || parcels.find((prc) => prc.trackingNumber === t.trackingNumber) || null;
+      return { ...t, user: u, parcel: p };
+    });
+    return Promise.resolve({ status: 200, data: { success: true, tickets: enriched } });
   }
 
   // 17. SUPPORT: POST /support
   if (path === '/support' && method === 'post') {
     const tickets = getStore('tickets', initialTickets);
+    const users = getStore('users', initialUsers);
+    const userSafe = currentUser ? { id: currentUser.id, name: currentUser.name, email: currentUser.email, phone: currentUser.phone } : { name: 'Customer', email: 'user@example.com' };
     const newTicket = {
       id: `ticket-${Date.now()}`,
       ...body,
       status: 'OPEN',
       customerId: currentUser?.id || 'demo-cust',
       createdAt: new Date().toISOString(),
+      user: userSafe,
     };
     tickets.unshift(newTicket);
     setStore('tickets', tickets);

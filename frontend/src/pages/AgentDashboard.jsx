@@ -131,8 +131,8 @@ const AgentDashboard = () => {
                       <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
                         <td className="py-3.5 px-3 font-mono font-bold text-slate-900">{p.trackingNumber}</td>
                         <td className="py-3.5 px-3">
-                          <div className="font-bold text-slate-800">{p.receiver.name}</div>
-                          <div className="text-slate-500 text-[11px]">{p.receiver.address}, {p.receiver.city}</div>
+                          <div className="font-bold text-slate-800">{p.receiver?.name || 'Recipient'}</div>
+                          <div className="text-slate-500 text-[11px]">{p.receiver?.address || ''}, {p.receiver?.city || ''}</div>
                         </td>
                         <td className="py-3.5 px-3 text-slate-700 font-semibold">{p.currentLocation}</td>
                         <td className="py-3.5 px-3"><StatusBadge status={p.status} size="sm" /></td>

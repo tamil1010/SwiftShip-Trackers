@@ -174,7 +174,7 @@ const TrackPublicPage = () => {
                       </div>
                       <div>
                         <div className="text-[10px] font-bold text-indigo-700 uppercase">Assigned Delivery Agent</div>
-                        <div className="text-xs font-extrabold text-slate-900">{parcel.assignedAgent.name}</div>
+                        <div className="text-xs font-extrabold text-slate-900">{parcel.assignedAgent?.name || 'Assigned Agent'}</div>
                         <div className="text-[11px] text-slate-600 flex items-center gap-1 mt-0.5">
                           <Phone className="w-3 h-3 text-slate-400" /> {parcel.assignedAgent.phone || 'N/A'}
                         </div>
@@ -224,13 +224,13 @@ const TrackPublicPage = () => {
                   <div className="space-y-4 text-xs">
                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
                       <span className="text-[10px] font-bold text-sky-700 uppercase block mb-1">Sender (Origin)</span>
-                      <div className="font-bold text-slate-900">{parcel.sender.name}</div>
-                      <div className="text-slate-500 mt-0.5">{parcel.sender.city}, {parcel.sender.state} ({parcel.sender.pincode})</div>
+                      <div className="font-bold text-slate-900">{parcel.sender?.name || 'Sender'}</div>
+                      <div className="text-slate-500 mt-0.5">{parcel.sender?.city || ''}, {parcel.sender?.state || ''} ({parcel.sender?.pincode || ''})</div>
                     </div>
                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
                       <span className="text-[10px] font-bold text-emerald-700 uppercase block mb-1">Receiver (Destination)</span>
-                      <div className="font-bold text-slate-900">{parcel.receiver.name}</div>
-                      <div className="text-slate-500 mt-0.5">{parcel.receiver.city}, {parcel.receiver.state} ({parcel.receiver.pincode})</div>
+                      <div className="font-bold text-slate-900">{parcel.receiver?.name || 'Receiver'}</div>
+                      <div className="text-slate-500 mt-0.5">{parcel.receiver?.city || ''}, {parcel.receiver?.state || ''} ({parcel.receiver?.pincode || ''})</div>
                     </div>
                   </div>
                 </div>

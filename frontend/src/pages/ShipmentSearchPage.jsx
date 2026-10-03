@@ -88,8 +88,8 @@ const ShipmentSearchPage = () => {
                     {results.map((p) => (
                       <tr key={p.id} className="hover:bg-slate-50/80">
                         <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{p.trackingNumber}</td>
-                        <td className="py-3.5 px-4 text-slate-700">{p.sender.name} ({p.sender.city})</td>
-                        <td className="py-3.5 px-4 text-slate-700">{p.receiver.name} ({p.receiver.city})</td>
+                        <td className="py-3.5 px-4 text-slate-700">{p.sender?.name || 'Sender'} ({p.sender?.city || 'Origin'})</td>
+                        <td className="py-3.5 px-4 text-slate-700">{p.receiver?.name || 'Receiver'} ({p.receiver?.city || 'Dest'})</td>
                         <td className="py-3.5 px-4"><StatusBadge status={p.status} size="sm" /></td>
                         <td className="py-3.5 px-4 text-right">
                           <Link

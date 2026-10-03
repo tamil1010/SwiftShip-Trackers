@@ -94,7 +94,7 @@ const SupportTicketsPage = () => {
                         <h3 className="font-bold text-sm text-slate-900">{t.subject}</h3>
                       </div>
                       <p className="text-xs text-slate-500 mt-1">
-                        Customer: <strong>{t.user.name}</strong> ({t.user.email} | {t.user.phone || 'N/A'})
+                        Customer: <strong>{t.user?.name || 'Customer'}</strong> ({t.user?.email || 'N/A'} | {t.user?.phone || 'N/A'})
                       </p>
                     </div>
 

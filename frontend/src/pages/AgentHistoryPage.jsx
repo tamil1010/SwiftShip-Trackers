@@ -64,8 +64,8 @@ const AgentHistoryPage = () => {
                     {parcels.map((p) => (
                       <tr key={p.id} className="hover:bg-slate-50/80">
                         <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{p.trackingNumber}</td>
-                        <td className="py-3.5 px-4 font-bold text-slate-800">{p.receiver.name}</td>
-                        <td className="py-3.5 px-4 text-slate-600">{p.receiver.city}</td>
+                        <td className="py-3.5 px-4 font-bold text-slate-800">{p.receiver?.name || 'Customer'}</td>
+                        <td className="py-3.5 px-4 text-slate-600">{p.receiver?.city || ''}</td>
                         <td className="py-3.5 px-4 text-slate-500">
                           {p.deliveredAt ? new Date(p.deliveredAt).toLocaleString() : new Date(p.updatedAt).toLocaleDateString()}
                         </td>
