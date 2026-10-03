@@ -68,10 +68,10 @@ const AdminDashboard = () => {
               
               {/* Stat Cards */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard title="Total Parcels" value={data.stats.totalParcels} icon={Package} color="sky" />
-                <StatCard title="Active In-Transit" value={data.stats.activeParcels} icon={Truck} color="amber" />
-                <StatCard title="Delivered Rate" value={data.stats.successRate} icon={CheckCircle2} color="emerald" />
-                <StatCard title="Active Delivery Agents" value={data.stats.activeAgents} icon={Users} color="indigo" />
+                <StatCard title="Total Parcels" value={data.stats?.totalParcels ?? 0} icon={Package} color="sky" />
+                <StatCard title="Active In-Transit" value={data.stats?.activeParcels ?? 0} icon={Truck} color="amber" />
+                <StatCard title="Delivered Rate" value={data.stats?.successRate ?? '100%'} icon={CheckCircle2} color="emerald" />
+                <StatCard title="Active Delivery Agents" value={data.stats?.activeAgents ?? 0} icon={Users} color="indigo" />
               </div>
 
               {/* Recharts Analytics Grid */}
@@ -84,7 +84,7 @@ const AdminDashboard = () => {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={data.statusDistribution}
+                          data={data.statusDistribution || []}
                           cx="50%"
                           cy="50%"
                           innerRadius={60}
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
                           paddingAngle={3}
                           dataKey="value"
                         >
-                          {data.statusDistribution.map((entry, index) => (
+                          {(data.statusDistribution || []).map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
@@ -108,7 +108,7 @@ const AdminDashboard = () => {
                   <h3 className="text-sm font-extrabold text-slate-900 mb-4">City-wise Shipment Volume</h3>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={data.cityStats}>
+                      <BarChart data={data.cityStats || []}>
                         <XAxis dataKey="city" stroke="#64748b" fontSize={11} />
                         <YAxis stroke="#64748b" fontSize={11} />
                         <Tooltip />
@@ -136,7 +136,7 @@ const AdminDashboard = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {data.agentPerformance.map((agent) => (
+                      {(data.agentPerformance || []).map((agent) => (
                         <tr key={agent.id} className="hover:bg-slate-50/80">
                           <td className="py-3.5 px-4 font-bold text-slate-900">{agent.name}</td>
                           <td className="py-3.5 px-4 text-slate-600">{agent.city}</td>

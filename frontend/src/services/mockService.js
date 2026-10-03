@@ -736,41 +736,72 @@ export function handleMockRequest(config) {
     const parcels = getStore('parcels', initialParcels);
     const users = getStore('users', initialUsers);
 
-    const totalShipments = parcels.length;
-    const delivered = parcels.filter(p => p.status === 'DELIVERED').length;
-    const inTransit = parcels.filter(p => ['IN_TRANSIT', 'OUT_FOR_DELIVERY'].includes(p.status)).length;
-    const pending = parcels.filter(p => ['BOOKED', 'PICKED_UP'].includes(p.status)).length;
-    const totalRevenue = parcels.reduce((sum, p) => sum + (p.shippingCost || 0), 0);
-    const totalAgents = users.filter(u => u.role === 'DELIVERY_AGENT').length;
+    const totalParcels = parcels.length;
+    const deliveredCount = parcels.filter(p => p.status === 'DELIVERED').length;
+    const bookedCount = parcels.filter(p => p.status === 'BOOKED').length;
+    const pickedUpCount = parcels.filter(p => p.status === 'PICKED_UP').length;
+    const inTransitCount = parcels.filter(p => p.status === 'IN_TRANSIT').length;
+    const outForDeliveryCount = parcels.filter(p => p.status === 'OUT_FOR_DELIVERY').length;
+    const failedCount = parcels.filter(p => p.status === 'DELIVERY_FAILED').length;
+    const returnedCount = parcels.filter(p => p.status === 'RETURNED').length;
+
+    const activeParcels = bookedCount + pickedUpCount + inTransitCount + outForDeliveryCount;
+    const successRate = totalParcels > 0 ? ((deliveredCount / totalParcels) * 100).toFixed(1) : '100';
+    const activeAgents = users.filter(u => u.role === 'DELIVERY_AGENT').length;
     const totalCustomers = users.filter(u => u.role === 'CUSTOMER').length;
+
+    const statusDistribution = [
+      { name: 'Booked', value: bookedCount },
+      { name: 'Picked Up', value: pickedUpCount },
+      { name: 'In Transit', value: inTransitCount },
+      { name: 'Out for Delivery', value: outForDeliveryCount },
+      { name: 'Delivered', value: deliveredCount },
+      { name: 'Failed', value: failedCount },
+      { name: 'Returned', value: returnedCount },
+    ];
+
+    const cityStats = [
+      { city: 'Chennai', count: 8 },
+      { city: 'Coimbatore', count: 5 },
+      { city: 'Madurai', count: 4 },
+      { city: 'Tirunelveli', count: 3 },
+      { city: 'Bengaluru', count: 2 },
+    ];
+
+    const agents = users.filter(u => u.role === 'DELIVERY_AGENT');
+    const agentPerformance = agents.map(agent => {
+      const assigned = parcels.filter(p => p.assignedAgentId === agent.id);
+      const del = assigned.filter(p => p.status === 'DELIVERED').length;
+      const inProg = assigned.filter(p => ['IN_TRANSIT', 'OUT_FOR_DELIVERY', 'PICKED_UP'].includes(p.status)).length;
+      return {
+        id: agent.id,
+        name: agent.name,
+        city: agent.city || 'Hub Depot',
+        totalAssigned: assigned.length || 2,
+        delivered: del || 1,
+        inProgress: inProg || 1,
+        completionRate: `${assigned.length > 0 ? Math.round((del / assigned.length) * 100) : 85}%`,
+      };
+    });
 
     return Promise.resolve({
       status: 200,
       data: {
         success: true,
         stats: {
-          totalShipments,
-          delivered,
-          inTransit,
-          pending,
-          totalRevenue,
-          totalAgents,
+          totalParcels,
+          activeParcels,
+          deliveredParcels: deliveredCount,
+          failedDeliveries: failedCount,
+          totalUsers: users.length,
+          activeAgents,
           totalCustomers,
-          statusBreakdown: [
-            { name: 'Booked', value: parcels.filter(p => p.status === 'BOOKED').length },
-            { name: 'Picked Up', value: parcels.filter(p => p.status === 'PICKED_UP').length },
-            { name: 'In Transit', value: parcels.filter(p => p.status === 'IN_TRANSIT').length },
-            { name: 'Out For Delivery', value: parcels.filter(p => p.status === 'OUT_FOR_DELIVERY').length },
-            { name: 'Delivered', value: delivered },
-          ],
-          cityDistribution: [
-            { city: 'Chennai', count: 8 },
-            { city: 'Coimbatore', count: 5 },
-            { city: 'Madurai', count: 3 },
-            { city: 'Tirunelveli', count: 4 },
-            { city: 'Bengaluru', count: 2 },
-          ],
+          successRate: `${successRate}%`,
         },
+        statusDistribution,
+        cityStats,
+        agentPerformance,
+        recentParcels: parcels.slice(0, 6),
       },
     });
   }
